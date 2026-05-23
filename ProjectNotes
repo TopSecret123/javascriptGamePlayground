@@ -1,0 +1,26 @@
+22/05
+Dodge the button.
+Claude mentioned its css based and wasnt sure why.
+
+Current thinking:
+Mouse position can be found as an x y position.
+Target object can be created using simple element
+Target distance from mouse can be calculated using xy
+Target position can be moved using distance.
+
+Unsure of
+- How to change Target position on screen
+- Whether this needs canvas for x y or I can just use DOM tree
+- Im unsure why using the style style.top and style.left worked while style.x y didn't work.
+
+Current understanding:
+- its all horizontal blocks
+
+Steps:
+1. Create Target object and try to change its position
+- Did this via css Styles tag.
+
+Learning:
+- CSS controls positioning via top left right bottom in styles. Also has relative, static etc.
+- Absolute css positioning appears to act as though the element is on a different z-axis so that it can be placed anywhere regardless of underlying element positioning.
+- I can convert numbers to pixels using template literals

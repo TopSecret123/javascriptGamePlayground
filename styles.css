@@ -1,0 +1,44 @@
+#target-dot{
+    width:50px;
+    height: 50px;
+    border-radius: 25px;
+    background-color: red;
+    position: absolute;
+}
+#second-box{
+    height: 100px;
+    width: 300px;
+    background-color: hsla(240, 100%, 50%, 0.658);
+}
+#third-box{
+    height: 100px;
+    width: 300px;
+    background-color: hsla(0, 0%, 70%, 0.773);
+}
+
+button {
+    margin-top:200px;
+    background-color: rgba(127, 245, 135, 0.38);
+    width: 200px;
+    height: 60px;
+    border-radius: 25px;
+}
+button:hover{
+    background-color: rgb(127, 245, 135);
+    font-size: x-large;
+    font-weight: bold;
+}
+
+#counter-display{
+    background-color: azure;
+    width:600px;
+    height: 140px;
+    margin-top: 140px;
+}
+
+#counter-container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
