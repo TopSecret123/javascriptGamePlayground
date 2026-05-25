@@ -13,22 +13,39 @@ let intervalId = "";
 
 /**
  * Ball Handler has balls. Moves Balls. 
+ * Ball container -> hmm who should have that. Needs to be some connection between balls and ball container. 
  * For now -> Detect collisions and knows the boundary -> refactor when necessary.
  */
-class ballHandler {
+class BallHandler {
 	constructor () {
-		this.balls;
-
+		this.balls = [];
+		this.ballContainer = null;
 	}
-}
 
+	addBall = (ball) => {
+		this.balls.push(ball)
+		ball.startMoving();
+	}
+
+
+	//should ballHandler be the one moving the ball or just tell the ball to move. 
+	
+}
+/**
+ * lastMove
+ */
 class movingBallC {
 	constructor (el) {
 		this.start = null;
+		this.el = el
+		this.xPos = this.el.getBoundingClientRect().x
+		this.yPos = this.el.getBoundingClientRect().y
 		this.xVel = this.initialVel();
 		this.yVel = this.initialVel();
-		this.speed = 80 + Math.random() * 10 * 120
-		this.el = el
+		this.xOrigin = this.el.getBoundingClientRect().x
+		this.yOrigin = this.el.getBoundingClientRect().y
+		this.xStart;
+		this.yStart;
 	}
 
 	startMoving = () => {
@@ -39,7 +56,7 @@ class movingBallC {
 	}
 
 	initialVel = () => {
-		const speed = 80 + (Math.random() * 700);
+		const speed = 80 + (Math.random() * 200);
 		const vel = Math.random() < 0.5 ? speed : - speed ;
 		return vel;
 	}
@@ -69,28 +86,45 @@ class movingBallC {
 		//location = object xPos yPos
 	}
 
+	determineNewPos = (axis, timestamp) => {
+		const {pos, vel, start, origin} = axis;
+		let elapsed = (timestamp - start) /1000
+		let newPos = origin + (vel * elapsed)
+		return newPos;
+	}
+
+	updatePos
+
 	move = (timestamp) => {
+		if(!this.xStart) this.xStart = timestamp;
+		if(!this.yStart) this.yStart = timestamp;
+		const newXPos = this.determineNewPos({pos: this.xPos, vel: this.xVel, start: this.xStart, origin: this.xOrigin}, timestamp);
+		const newYPos = this.determineNewPos({pos: this.yPos, vel: this.yVel, start: this.yStart, origin: this.yOrigin}, timestamp);
+		console.log(newXPos);
+		console.log(newYPos);
+		//Update prevMove to timestamp at end of cycle.
+
+		this.el.style.left = newXPos + "px";
+		this.el.style.top = newYPos + "px"
+
+		/*
 		if(!this.start) this.start = timestamp;
-		console.log(this)
 		let elapsed = (timestamp - this.start) / 1000;
 		let x = elapsed * this.xVel;
 		let y = elapsed * this.yVel;	
+		
 		//const element = document.getElementById(this.elementId)
 
 		//the elements position - this works as expected
 		const pos = this.el.getBoundingClientRect()
-		console.log(pos)
 		const {x: xPos, y: yPos} = pos;
-		console.log(x)
-		console.log(y)
-		console.log(xPos)
-		console.log(yPos)
 		
 		this.el.style.transform = `translate(${x}px, ${y}px)`
 		//this.el.style.transform = `translateY(${y}px)`
 		if ( xPos >= 0 && xPos < window.outerWidth - 32 || 
 			yPos >= 0 && yPos < window.outerHeight - 32
 		) {this.handleCollision("wall", pos)}
+		*/
 		requestAnimationFrame(this.move);
 	}
 
@@ -110,7 +144,7 @@ const handleMouseMove = (event) => {
 	x = event.x;
 	y = event.y;
 	updateMouseBox(x, y);
-	updateTargetPosition(x, y);
+	//updateTargetPosition(x, y);
 };
 
 
@@ -124,7 +158,8 @@ document.addEventListener("mousemove", (event) => {
 
 // Buttons - timer flashbox
 
-
+const ballHandler = new BallHandler();
+console.log(ballHandler)
 
 function newBall () {
 	const newDiv = document.createElement("div")
@@ -133,12 +168,10 @@ function newBall () {
 	newId = `ball-${numChildren}`;
 	newDiv.setAttribute("id", newId)
 	newDiv.style.left = "200px";
+	newDiv.style.top = "200px";
 	ballContainer.appendChild(newDiv)
 	const newBallObj = new movingBallC(newDiv);
-	console.log(newBallObj)
-	ballArray.push(newBallObj);
-	console.log(ballArray);
-	newBallObj.startMoving();
+	ballHandler.addBall(newBallObj)
 }
 
 
@@ -178,7 +211,6 @@ const updateTargetPosition = (x, y) => {
 	target.style.top = yVal;
 };
 
-//I want something to keep travelling.
 
 // Event Listeners
 document.getElementById("button").addEventListener("click", (event) => {
