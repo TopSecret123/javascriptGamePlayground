@@ -1,3 +1,8 @@
+25/05:
+- Get balls to bounce back from edge.
+-> Handle all internally inside ball. Simply invert the colliding axis direction
+-> the position calculation doesn't work doing it this way. I need an origin and start time for origin. essentially it'll calculate time in this direciton. Little bit tricky with transform formula as this uses the div css location as origin 
+
 22/05
 Dodge the button.
 Claude mentioned its css based and wasnt sure why.

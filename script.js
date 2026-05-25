@@ -11,6 +11,17 @@ let y = 0;
 
 let intervalId = "";
 
+/**
+ * Ball Handler has balls. Moves Balls. 
+ * For now -> Detect collisions and knows the boundary -> refactor when necessary.
+ */
+class ballHandler {
+	constructor () {
+		this.balls;
+
+	}
+}
+
 class movingBallC {
 	constructor (el) {
 		this.start = null;
@@ -33,6 +44,31 @@ class movingBallC {
 		return vel;
 	}
 
+	handleCollisionAxis = (collisionPos) => {
+		const {x: xPos, y: yPos} = collisionPos
+
+		let axis;
+		axis = xPos <= 0 || xPos > windowOuterW - 32 ? "x" : "y"
+		switch (axis) {
+			case "x":
+				this.xVel = - this.xVel;
+				break;
+			case "y":
+				this.yVel = -this.yVel;
+				break;
+		}
+	}
+
+	handleCollision = (surface, collisionPos) => {
+		//surface options: wall
+		switch (surface) {
+			case "wall":
+			this.handleCollisionAxis(collisionPos);
+			break;
+		}
+		//location = object xPos yPos
+	}
+
 	move = (timestamp) => {
 		if(!this.start) this.start = timestamp;
 		console.log(this)
@@ -52,11 +88,10 @@ class movingBallC {
 		
 		this.el.style.transform = `translate(${x}px, ${y}px)`
 		//this.el.style.transform = `translateY(${y}px)`
-		if ( xPos >= 0 && xPos < window.outerWidth - 32 &&
+		if ( xPos >= 0 && xPos < window.outerWidth - 32 || 
 			yPos >= 0 && yPos < window.outerHeight - 32
-		) {
-			requestAnimationFrame(this.move);
-		}
+		) {this.handleCollision("wall", pos)}
+		requestAnimationFrame(this.move);
 	}
 
 }
