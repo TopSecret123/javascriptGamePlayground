@@ -5,6 +5,9 @@
 - Ball Handler -> Now controls the adding of a new Ball.
 - Next step -> make balls move
 
+Wins:
+- Fk yeah -> The moment that ball bounced off the left wall it was fucking magical
+
 Next steps:
 - Move the RAF to ballContainer. ball can still use .move() so RAF loops throough and calls .move for each.
 - Give container element to ballHandler -> add el to field.
