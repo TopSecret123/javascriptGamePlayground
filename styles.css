@@ -25,7 +25,7 @@ h1{
 }
 
 button {
-    margin-top:200px;
+    margin: 50px 5px;
     background-color: rgba(127, 245, 135, 0.38);
     width: 200px;
     height: 60px;
@@ -48,11 +48,10 @@ button:hover{
     visibility: hidden;
 }
 
-#counter-container{
+#button-container{
     display: flex;
     justify-content: center;
     align-items: center;
-    flex-direction: column;
 }
 
 .moving-ball{
@@ -61,4 +60,10 @@ button:hover{
     border-radius: 50px;
     background-color: rgb(66, 247, 132);
     position: absolute;
+}
+
+#ball-container{
+    width: 100vw;
+    height: 80vh;
+    border: 5px solid black;
 }

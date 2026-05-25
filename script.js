@@ -19,12 +19,49 @@ let intervalId = "";
 class BallHandler {
 	constructor () {
 		this.balls = [];
-		this.ballContainer = null;
+		this.ballContainer = ballContainer;
 	}
 
 	addBall = (ball) => {
 		this.balls.push(ball)
 		ball.startMoving();
+	}
+
+	//resolve collisions.
+		//Detect collision. 
+		//Determine new velocities
+		//Give ball new velocity.
+
+	moveBalls = (timestamp) => {
+		this.balls.forEach((ball) => ball.move(timestamp))
+		//resolve collisions
+		requestAnimationFrame(this.moveBalls)
+	}
+
+	startMoving = () => {
+		requestAnimationFrame(this.moveBalls)
+	}
+
+	containerBounds = () => {
+		return this.ballContainer.getBoundingClientRect();
+	}
+
+	newBall = () => {
+		const {top, right, left, bottom} = this.containerBounds();
+		console.log(this.containerBounds())
+		//Create new div and set tags.
+		const newDiv = document.createElement("div")
+		const numBalls = this.balls.length;
+		const newId = `ball-${numBalls}`;
+		newDiv.setAttribute("class", "moving-ball")
+		newDiv.setAttribute("id", newId)
+		//Set positioning
+		newDiv.style.left = left + 200 + "px";
+		newDiv.style.top = top + 200 + "px";
+		//add Div and Ball to their homes (html and js)
+		this.ballContainer.appendChild(newDiv)
+		this.addBall(new movingBallC(newDiv))
+		if(this.balls.length == 1) this.startMoving();
 	}
 
 
@@ -46,6 +83,19 @@ class movingBallC {
 		this.yOrigin = this.el.getBoundingClientRect().y
 		this.xStart;
 		this.yStart;
+		this.mass = 1;
+	}
+	
+	setXVel = (xVel) => {
+		this.xVel = xVel;
+	}
+
+	setYVel = (yVel) => {
+		this.yVel = yVel;
+	}
+
+	getVelocity = () => {
+		return {xVel: this.xVel, yVel: this.yVel};
 	}
 
 	startMoving = () => {
@@ -125,7 +175,7 @@ class movingBallC {
 			yPos >= 0 && yPos < window.outerHeight - 32
 		) {this.handleCollision("wall", pos)}
 		*/
-		requestAnimationFrame(this.move);
+		//requestAnimationFrame(this.move);
 	}
 
 }
@@ -161,18 +211,7 @@ document.addEventListener("mousemove", (event) => {
 const ballHandler = new BallHandler();
 console.log(ballHandler)
 
-function newBall () {
-	const newDiv = document.createElement("div")
-	const numChildren = ballContainer.children.length;
-	newDiv.setAttribute("class", "moving-ball")
-	newId = `ball-${numChildren}`;
-	newDiv.setAttribute("id", newId)
-	newDiv.style.left = "200px";
-	newDiv.style.top = "200px";
-	ballContainer.appendChild(newDiv)
-	const newBallObj = new movingBallC(newDiv);
-	ballHandler.addBall(newBallObj)
-}
+
 
 
 function startTimer(counterDisplay) {
@@ -194,7 +233,7 @@ const handleClick = (event, source) => {
 	switch (source) {
 		case "start":
 			//startTimer(counterDisplay);
-			newBall();
+			ballHandler.newBall();
 			break;
 		case "stop":
 			stopTimer(intervalId);
@@ -202,6 +241,17 @@ const handleClick = (event, source) => {
 	}
 };
 
+
+
+
+
+// Event Listeners
+document.getElementById("start-button").addEventListener("click", (event) => {
+	handleClick(event, "start");
+});
+document.getElementById("stop-button").addEventListener("click", (event) => {
+	handleClick(event, "stop")
+})
 
 const updateTargetPosition = (x, y) => {
 	const xVal = `${x}px`;
@@ -212,35 +262,5 @@ const updateTargetPosition = (x, y) => {
 };
 
 
-// Event Listeners
-document.getElementById("button").addEventListener("click", (event) => {
-	handleClick(event, "start");
-});
-document.getElementById("stop-button").addEventListener("click", (event) => {
-	handleClick(event, "stop")
-})
 
-//position = position + 2
-const zero = document.timeline.currentTime;
-let position = 0;
-const speed = 2;
-requestAnimationFrame(animate);
-function animate(timestamp) {
-	const value = (timestamp - zero) / duration;
-}
 
-let start;
-
-function step(timestamp) {
-	if(start == undefined) {
-		start = timestamp;
-	}
-	const elapsed = timestamp - start;
-
-	const shift = Math.min(0.1 * elapsed, 200);
-	movingBall.style.transform = `translateX(${shift}px)`;
-	if (shift < 200) {
-		requestAnimationFrame(step);
-	}
-}
-requestAnimationFrame(step);

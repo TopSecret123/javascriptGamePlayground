@@ -1,7 +1,37 @@
+
+26/05:
+- Ball container -> Added to ballHandler.
+- Ball Container used to drop balls into.
+- Ball Handler -> Now controls the adding of a new Ball.
+- Next step -> make balls move
+
+Next steps:
+- Move the RAF to ballContainer. ball can still use .move() so RAF loops throough and calls .move for each.
+- Give container element to ballHandler -> add el to field.
+- Use container to get bounds.
+- ballContainer can have a collision detection.
+
+Ball Manager:
+- Knows position of all balls.
+- responsible for determining if collision has happened.
+- Gives updated velocities to ball after collision (later be outsourced to utility perhaps)
+
+Balls:
+- Does not know that a collision has happened 
+- Can move itself using its own velocity and position.
+
+
 25/05:
 - Get balls to bounce back from edge.
 -> Handle all internally inside ball. Simply invert the colliding axis direction
 -> the position calculation doesn't work doing it this way. I need an origin and start time for origin. essentially it'll calculate time in this direciton. Little bit tricky with transform formula as this uses the div css location as origin 
+
+Today:
+- Managed to get ball shooting in x and y directions.
+- Learning is to use .style instead of transform as it becomes complex when direction changes.
+- Began migration to ballHandler so that I can have all movements in one update cycle and I can check for collisions.
+- Classes should be PascalCase otherwise the names will clash between class blueprint and instance.
+- Much more comofrtable with object structuring and destructuring with function arguments. Feels natural now.
 
 22/05
 Dodge the button.
