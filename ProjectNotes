@@ -1,3 +1,6 @@
+Next step:
+- Check if the ball respects container if just one axis is used. (make container smaller)
+- trace logic flow for setting origin -> Perhaps I can use velocity as a filter check to determine if its travelling towards the boundary or not -> this could be a simpler fix.
 
 26/05:
 - Ball container -> Added to ballHandler.

@@ -36,9 +36,14 @@ class CollisionManager {
 					//update velocities accordingly
 			//create new array so I can pop off if true.
 			this.balls.forEach((ball) => {
-				this.detectCollision(ball, this.container, this.timestamp) // boolean says yes true.
-				
+				this.detectCollision(ball, this.container, this.timestamp) // Creates collision card. 
 			})
+			if(this.collisionCards.length == 0) {
+				console.log("No cards")
+			}
+			else {
+				this.collisionCards.forEach((card) => this.updateVelocity(card))
+			}
 		}
 
 	detectCollision = (ball, container, timestamp) => {
@@ -49,11 +54,11 @@ class CollisionManager {
 		
 		
 		const {left, top, width, height} = ball.el.getBoundingClientRect()
-		//Find the exact mid point of circle on both x and y plane
-		const xMid = left + (0.5 * width)
-		const yMid = top + (0.5 * height)
+		const {xVel, yVel, radius} = ball;
+		const xMid = ball.getXMid();
+		const yMid = ball.getYMid();
+		
 		//exact circle so radius = 1/2 diam which is 1/2 width (or height)
-		const radius = 0.5 * width
 		//wall is simple -> just radius vs wall x or y 
 		
 		const {left: wLeft, top: wTop, right: wRight, bottom: wBottom} = container.getBoundingClientRect()
@@ -63,37 +68,28 @@ class CollisionManager {
 		console.log(wLeft)
 		//check each four walls.
 		//create wallObj just in case of collision (not optimal but not big problem.)
-		const wall = {mass: Infinity, xVel: 0, yVel: 0, }
-		console.log("xMid");
-		console.log(xMid)
-		console.log(radius)
-		console.log(left)
-		if((xMid - radius) <= wLeft ) {
-			//Need to add collision location.
-			this.collisionCards.push(new CollisionCard(ball, wall, "x", wLeft));
+		const wall = {mass: Infinity, xVel: 0, yVel: 0, bounds}
+		if(
+			(xMid - radius) <= wLeft &&
+			(xVel < 0) ) {
+			this.collisionCards.push(new CollisionCard(ball, wall, "x", "left"));
 			console.log(this.collisionCards)
-			//ball.setXVel(-ball.xVel)
-			//ball.xOrigin = wLeft;
-			//ball.xStart = timestamp;
 		}
-		if((xMid + radius) > wRight) {
-			this.collisionCards.push(new CollisionCard(ball, wall, "x", wRight));
+		if(
+			(xMid + radius) >= wRight &&
+			(xVel > 0)) {
+			this.collisionCards.push(new CollisionCard(ball, wall, "x", "right"));
 		}
-		if((yMid - radius) <= wTop) {
-			this.collisionCards.push(new CollisionCard(ball, wall, "y", wTop));
+		if(
+			(yMid - radius) <= wTop &&
+			(yVel < 0)) {
+			this.collisionCards.push(new CollisionCard(ball, wall, "y", "top"));
 		}
-		if((yMid + radius) >= wBottom) {
-			this.collisionCards.push(new CollisionCard(ball, wall, "y", wBottom));
+		if(
+			(yMid + radius) >= wBottom &&
+			(yVel > 0)) {
+			this.collisionCards.push(new CollisionCard(ball, wall, "y", "bottom"));
 		}
-		console.log("Cards Length")
-		console.log(this.collisionCards.length)
-		if(this.collisionCards.length == 0) {
-			console.log("No cards")
-		}
-		else {
-			this.collisionCards.forEach((card) => this.updateVelocity(card))
-		}
-		
 	}
 
 	updateVelocity = (card) => {
@@ -103,34 +99,28 @@ class CollisionManager {
 			//console.log(`${obj1.el.id} x collision | vel before: ${obj1.getXVel()} | vel after: ${-obj1.getXVel()}`)
 			obj1.setXVel(-obj1.getXVel());
 			obj1.setXStart(this.timestamp);
-			if(location < 100) {
-				obj1.setXOrigin(location + obj1.radius + 5)
-			}
-			else {
-				obj1.setXOrigin(location - obj1.radius - 5)
-			}
-				
+			obj1.setXOrigin(obj1.getXMid())		
 			//obj1.setXOrigin(obj2.getXPos());
 		}
 		if(axis == "y") {
 			//console.log(`${obj1.el.id} y collision | vel before: ${obj1.getYVel()} | vel after: ${-obj1.getYVel()}`)
 			obj1.setYVel(-obj1.getYVel());
 			obj1.setYStart(this.timestamp);
-			obj1.setYOrigin(obj1.getYPos());
+			obj1.setYOrigin(obj1.getYMid());
 		}
 	}
 
 
 }
 
-//interfect obj 1 and obj2 (mass, xVel, yVel)
+//interfect obj 1 and obj2 (mass, xVel, yVel, bounds (for wall at least))
 //if mass is infinite then must be call.
 class CollisionCard {
-	constructor (obj1, obj2, collisionAxis, collisionLocation) {
+	constructor (obj1, obj2, collisionAxis, obj1CollisionLocation) {
 		this.obj1 = obj1;
 		this.obj2 = obj2;
 		this.collisionAxis = collisionAxis;
-		this.location = collisionLocation;
+		this.location = obj1CollisionLocation;
 	}
 	//Each object must have an element
 	//For now we will just clash with wall.
@@ -158,11 +148,12 @@ class BallHandler {
 		console.log(this.ballContainer)
 		const collisionManager = new CollisionManager(this.balls, this.ballContainer, timestamp);
 		collisionManager.resolveCollisions();
-	}
+	}	
 
 	moveBalls = (timestamp) => {
-		 
+		console.log("Move Balls")
 		this.balls.forEach((ball) => {
+			console.log(ball.toString());
 			ball.move(timestamp)
 		})
 		this.resolveCollisions(timestamp);
@@ -179,6 +170,7 @@ class BallHandler {
 	}
 
 	newBall = () => {
+		console.log("New ball added");
 		const {top, right, left, bottom} = this.containerBounds();
 		console.log(this.containerBounds())
 		//Create new div and set tags.
@@ -192,7 +184,7 @@ class BallHandler {
 		newDiv.style.top = top + 400 + "px";
 		//add Div and Ball to their homes (html and js)
 		this.ballContainer.appendChild(newDiv)
-		this.addBall(new MovingBall(newDiv))
+		this.addBall(new MovingBall(newDiv, newId))
 		//if(this.balls.length == 1) this.startMoving();
 	}
 
@@ -204,21 +196,34 @@ class BallHandler {
  * lastMove
  */
 class MovingBall {
-	constructor (el) {
+	constructor (el, id) {
 		this.start = null;
 		this.el = el
-		this.xPos = this.el.getBoundingClientRect().x
+		this.xPos = this.el.getBoundingClientRect().x //x and y is the top left corner.
 		this.yPos = this.el.getBoundingClientRect().y
-		this.xVel =  this.initialVel();
-		this.yVel =  this.initialVel();
-		this.xOrigin = this.el.getBoundingClientRect().x
-		this.yOrigin = this.el.getBoundingClientRect().y
+		this.xVel = this.initialVel();
+		this.yVel = this.initialVel();
+		
 		this.xStart;
 		this.yStart;
 		this.mass = 1;
 		this.radius = this.el.getBoundingClientRect().width * 0.5
+		this.xMid = this.el.getBoundingClientRect().left + this.radius
+		this.yMid = this.el.getBoundingClientRect().top + this.radius
+		this.xOrigin = this.el.getBoundingClientRect().left + this.radius
+		this.yOrigin = this.el.getBoundingClientRect().top + this.radius
+		this.id = id;
 	}
-	
+	toString = () => {
+		return `Ball ${this.id}
+	xPos: ${this.xPos} | yPos: ${this.yPos}
+	xMid: ${this.getXMid()} | yMid: ${this.getYMid()}
+	xVel: ${this.xVel} | yVel: ${this.yVel}
+	xOrigin: ${this.xOrigin} | yOrigin: ${this.yOrigin}
+	xStart: ${this.xStart} | yStart: ${this.yStart}
+	radius: ${this.radius} | mass: ${this.mass}`;
+	}
+
 	setXVel = (xVel) => {
 		this.xVel = xVel;
 	}
@@ -261,6 +266,14 @@ class MovingBall {
 
 	getYPos = () => {
 		return this.yPos;
+	}
+
+	getXMid = () => {
+		return this.el.getBoundingClientRect().left + this.radius
+	}
+
+	getYMid = () => {
+		return this.el.getBoundingClientRect().top + this.radius
 	}
 
 	startMoving = () => {
@@ -354,7 +367,7 @@ const updateMouseBox = (x, y) => {
 	mouseBox.textContent = `window out: ${window.outerWidth} window in: ${window.innerWidth} \n\nx: ${x}  y: ${y} \n`;
 };
 
-const movingBall = document.getElementById("moving-ball")
+//const movingBall = document.getElementById("moving-ball")
 
 
 const handleMouseMove = (event) => {
